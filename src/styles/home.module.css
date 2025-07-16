@@ -1,0 +1,23 @@
+@layer utilities {
+    .perspective {
+        perspective: 800px;
+    }
+
+    .preserve-3d {
+        transform-style: preserve-3d;
+    }
+
+    .animate-crawl {
+        animation: star-crawl 60s linear forwards;
+    }
+
+    @keyframes star-crawl {
+        0% {
+            transform: rotateX(40deg) translateY(100%) translateZ(0);
+        }
+
+        100% {
+            transform: rotateX(40deg) translateY(-300%) translateZ(-180px);
+        }
+    }
+}
