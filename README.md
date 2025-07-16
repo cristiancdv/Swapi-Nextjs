@@ -35,65 +35,142 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-structure of Proyect
-/src                    ← Source
-    /app                ← App
-    layout.tsx          ← Entrypoint
-    page.tsx            ← IntroPage
-    /characters
-      page.tsx          ← CharacterPage
-    /movies
-      page.tsx          ← MoviePage
-    /ships
-      page.tsx          ← ShipPage
-    /planets
-      page.tsx          ← PlanetPage
-  /assets
-    /images
-      StarWarsLogo.svg  ← Logo svg
-  /components
-    /ui
-      Card.tsx          ← CardComponent
-      CardImage.tsx     ← CardImageComponent
-    /layoutComponent
-      Footer.tsx        ← FooterComponent
-      Logo.tsx          ← LogoComponent
-      NavBar.tsx        ← NavBarComponent
-      NavItem.tsx       ← NavItemComponent
-  /constant
-    navItems.ts         ← NavItemConstant
-  /features
-    /entities
-      components/
-      services/
-      types/
-  /hooks                ← Hooks
-  /utils                ← Helpers, misc
-  /styles               ← Tailwind config / global.css
-    globals.css
-    home.module.css
-  /tests                ← Testings
-    /app
-      home.test.tsx
-      layout.test.tsx
-    /components
-      /cardComponent
-        card.test.tsx
-        cardImage.test.tsx
-      /layoutComponents
-        footer.test.tsx
-        logo.test.tsx
-        navBar.test.tsx
-        navItem.test.tsx
-  /utils
-.gitignore
-eslint.config.mjs
-jest.config.ts
-jest.setup.ts
-next-env.d.ts
-next.config.ts
-packaje-lock.json
-package.json
-postcss.config.mjs
-README.md
-tsconfig.json
+## 📁 Project Structure
+
+```
+new-swapi/
+├── 📄 package.json
+├── 📄 package-lock.json
+├── 📄 next.config.ts
+├── 📄 tailwind.config.ts
+├── 📄 tsconfig.json
+├── 📄 jest.config.ts
+├── 📄 jest.setup.ts
+├── 📄 eslint.config.mjs
+├── 📄 postcss.config.mjs
+├── 📄 next-env.d.ts
+├── 📄 .gitignore
+├── 📄 README.md
+├── 📁 public/
+│   ├── 📄 favicon.ico
+│   ├── 📄 file.svg
+│   ├── 📄 globe.svg
+│   ├── 📄 next.svg
+│   ├── 📄 vercel.svg
+│   └── 📄 window.svg
+└── 📁 src/
+    ├── 📁 app/
+    │   ├── 📄 layout.tsx
+    │   ├── 📄 page.tsx
+    │   ├── 📁 characters/
+    │   │   └── 📄 page.tsx
+    │   ├── 📁 movies/
+    │   │   └── 📄 page.tsx
+    │   ├── 📁 planets/
+    │   │   └── 📄 page.tsx
+    │   └── 📁 ships/
+    │       └── 📄 page.tsx
+    ├── 📁 assets/
+    │   ├── 📁 icons/
+    │   │   ├── 📄 CardIcon.tsx
+    │   │   └── 📄 ListIcon.tsx
+    │   └── 📁 images/
+    │       ├── 📄 LoadingLogo.svg
+    │       ├── 📄 StarWarsLogo.svg
+    │       └── 📄 triangleAlert.svg
+    ├── 📁 components/
+    │   ├── 📁 layoutComponent/
+    │   │   ├── 📄 Footer.tsx
+    │   │   ├── 📄 Logo.tsx
+    │   │   ├── 📄 NavBar.tsx
+    │   │   └── 📄 NavItem.tsx
+    │   └── 📁 ui/
+    │       ├── 📄 Card.tsx
+    │       ├── 📄 CardImage.tsx
+    │       ├── 📄 ErrorMessage.tsx
+    │       ├── 📄 LoadingSpinner.tsx
+    │       ├── 📄 SwitchButton.tsx
+    │       └── 📄 Table.tsx
+    ├── 📁 config/
+    │   ├── 📄 config.ts
+    │   └── 📄 env.ts
+    ├── 📁 constant/
+    │   └── 📄 navItems.ts
+    ├── 📁 entities/
+    ├── 📁 features/
+    │   └── 📁 entities/
+    │       ├── 📁 types/
+    │       └── 📁 views/
+    │           ├── 📄 CardsView.tsx
+    │           ├── 📄 EntityView.tsx
+    │           └── 📄 TableView.tsx
+    ├── 📁 hooks/
+    │   ├── 📄 UseEntityData.tsx
+    │   └── 📄 UseViewMode.tsx
+    ├── 📁 services/
+    │   ├── 📄 fetchEntity.ts
+    │   └── 📁 types/
+    ├── 📁 styles/
+    │   ├── 📄 globals.css
+    │   └── 📄 home.module.css
+    ├── 📁 test/
+    │   ├── 📁 app/
+    │   │   ├── 📄 home.test.tsx
+    │   │   ├── 📄 layout.test.tsx
+    │   │   ├── 📁 characters/
+    │   │   │   └── 📄 charactersPage.test.tsx
+    │   │   ├── 📁 movies/
+    │   │   │   └── 📄 moviesPage.test.tsx
+    │   │   ├── 📁 planets/
+    │   │   │   └── 📄 planetPage.test.tsx
+    │   │   └── 📁 ships/
+    │   │       └── 📄 shipsPage.test.tsx
+    │   ├── 📁 assets/
+    │   │   └── 📁 icons/
+    │   │       ├── 📄 cardIcon.test.tsx
+    │   │       └── 📄 listIcon.test.tsx
+    │   ├── 📁 components/
+    │   │   ├── 📁 layoutComponents/
+    │   │   │   ├── 📄 footer.test.tsx
+    │   │   │   ├── 📄 logo.test.tsx
+    │   │   │   ├── 📄 navBar.test.tsx
+    │   │   │   └── 📄 navItem.test.tsx
+    │   │   └── 📁 ui/
+    │   │       ├── 📄 card.test.tsx
+    │   │       ├── 📄 cardImage.test.tsx
+    │   │       ├── 📄 ErrorMessage.test.tsx
+    │   │       ├── 📄 loadingSpinner.test.tsx
+    │   │       ├── 📄 switchButton.test.tsx
+    │   │       └── 📄 table.test.tsx
+    │   ├── 📁 config/
+    │   │   └── 📄 config.test.ts
+    │   ├── 📁 features/
+    │   │   └── 📁 entities/
+    │   │       └── 📁 views/
+    │   │           ├── 📄 cardViews.test.tsx
+    │   │           ├── 📄 entityViews.test.tsx
+    │   │           └── 📄 tableViews.test.tsx
+    │   ├── 📁 hooks/
+    │   │   ├── 📄 useEntityData.test.tsx
+    │   │   └── 📄 useViewMode.test.tsx
+    │   └── 📁 services/
+    │       └── 📄 fetchEntity.test.ts
+    └── 📁 utils/
+```
+
+### 📋 Structure Overview
+
+- **`app/`** - Next.js App Router pages and layouts
+- **`assets/`** - Static assets like icons and images
+- **`components/`** - Reusable UI components
+  - **`layoutComponent/`** - Layout-specific components (NavBar, Footer, etc.)
+  - **`ui/`** - Generic UI components (Card, Table, etc.)
+- **`config/`** - Configuration files
+- **`constant/`** - Application constants
+- **`features/`** - Feature-based modules
+  - **`entities/`** - Entity-related features with types and views
+- **`hooks/`** - Custom React hooks
+- **`services/`** - API and external service integrations
+- **`styles/`** - Global styles and CSS modules
+- **`test/`** - Test files mirroring the src structure
+- **`utils/`** - Utility functions and helpers
