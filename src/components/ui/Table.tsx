@@ -111,7 +111,7 @@ export default function Table({ data ,entity,setSelectedId,onOpen }: { data: {id
                     {processedData.map((item: { [key: string]: string }, index) => (
                         <TableRow key={item.id} className={index % 2 === 0 ? "bg-gray-800/20" : "bg-gray-900/20"} onClick={() => handleClick(item.id)}>
                             {visibleColumns.map((key) => (
-                                <TableCell key={`${item.id}-${key}`} className="text-center">
+                                <TableCell key={`${item.id}-${key}`} className="text-center hover:cursor-pointer">
                                     {key === 'id' ? (
                                         <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-mono">
                                             #{item[key]}

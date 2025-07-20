@@ -1,6 +1,6 @@
 @layer utilities {
     .perspective {
-        perspective: 800px;
+        perspective: 900px;
     }
 
     .preserve-3d {
@@ -8,7 +8,7 @@
     }
 
     .animate-crawl {
-        animation: star-crawl 60s linear forwards;
+        animation: star-crawl 40s linear forwards;
     }
 
     @keyframes star-crawl {

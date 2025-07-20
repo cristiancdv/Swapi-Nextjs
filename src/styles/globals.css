@@ -21,12 +21,6 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #ededed;
-    --foreground: #0a0a0a;
-  }
-}
 
 body {
   background: var(--background) url('https://www.transparenttextures.com/patterns/stardust.png');
