@@ -13,7 +13,7 @@ export default function Home() {
         <p>Donde otros ven errores, yo veo oportunidades de refactorización.</p>
         <p>Y aunque el lado oscuro del código espagueti es tentador, la disciplina Jedi me guía.</p>
         <p>Si estás viendo esta intro, es porque estás listo para unirte a la rebelión del código elegante !!.</p>
-        <p>Soy un TL Jedi con más de 3 años de experiencia en el rubro del desarrollo.</p>
+        <p>Soy un TL Jedi con más de 5 años de experiencia en el rubro del desarrollo.</p>
         <p>Trabajo guiado por los principios del TDD y el clean-code, siempre con la Fuerza como aliada.</p>
         <p>Vivo junto a mi padawan Quiz, una aprendiz sensible a la Fuerza con gran potencial.</p>
         <p>Nos acompañan nuestros fieles robogatitos: K3R0, G414, M1N0S y C0SM0S, expertos en vigilancia y ronroneo

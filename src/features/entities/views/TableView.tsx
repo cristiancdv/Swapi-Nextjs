@@ -1,9 +1,9 @@
 "use client";
 import Table from "@/components/ui/Table";
 
-export default function TableView({ data ,entity}: { data: {id:string,name?:string, title?:string,description:string,image:string}[], entity: string }) {
+export default function TableView({ data ,entity,setSelectedId,onOpen }: { data: {id:string,name?:string, title?:string,description:string,image:string}[], entity: string,setSelectedId: (id:number) => void,onOpen:() => void }) {
     return (
-        <Table data={data} entity={entity} />
+        <Table setSelectedId={setSelectedId} onOpen={onOpen} data={data} entity={entity} />
     );
 }
 

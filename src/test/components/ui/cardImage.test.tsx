@@ -1,21 +1,32 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import CardImage from '@/components/ui/CardImage'
 
 jest.mock('next/image', () => ({
     __esModule: true,
-    default: ({ src, alt, width, height }: { src: string, alt: string, width: number, height: number }) => (
-        <img src={src} alt={alt} width={width} height={height} />
+    default: ({ src, alt, width }: { src: string, alt: string, width: number }) => (
+        <img src={src} alt={alt} width={width} />
     )
 }))
 
+// Mock the asset import
+jest.mock("@/assets/characters/0.jpeg", () => ({
+    __esModule: true,
+    default: "test-image-url"
+}))
+
 describe("CardImage", () => {
-it('should render the card image', () => { 
-    const {src, alt, width, height} = {src: 'https://via.placeholder.com/150', alt: 'Test', width: 100, height: 100}
-    render(<CardImage url={src} alt={alt} width={width} height={height} />)
+it('should render the card image', async () => { 
+    const {url, alt, width} = {url: 'characters/0.jpeg', alt: 'Test', width: 100}
+    render(<CardImage url={url} alt={alt} width={width} />)
+    
+    // Wait for the async image loading to complete
+    await waitFor(() => {
+        const image = screen.getByRole("img", {name: alt})
+        expect(image).toBeInTheDocument()
+    })
+
     const image = screen.getByRole("img", {name: alt})
-    expect(image).toBeInTheDocument()
-    expect(image).toHaveAttribute('src', src)
+    expect(image).toHaveAttribute('src', 'test-image-url')
     expect(image).toHaveAttribute('width', width.toString())
-    expect(image).toHaveAttribute('height', height.toString())
 })
 })

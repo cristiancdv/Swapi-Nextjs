@@ -12,6 +12,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "@heroui/modal": "^2.2.20",
     "@heroui/react": "^2.8.1",
     "@heroui/switch": "^2.2.21",
     "@heroui/table": "^2.2.23",

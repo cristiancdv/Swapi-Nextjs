@@ -8,7 +8,7 @@ import {
     TableRow
      } from "@heroui/react";
 
-export default function Table({ data ,entity }: { data: {id:string,name?:string,title?:string,description:string,image:string}[], entity: string }) {
+export default function Table({ data ,entity,setSelectedId,onOpen }: { data: {id:string,name?:string,title?:string,description:string,image:string}[], entity: string,setSelectedId: (id:number) => void,onOpen:() => void }) {
     const dataTable = data.filter((item) => item.name || item.title);
     
     // Función para parsear la descripción y extraer campos
@@ -81,7 +81,10 @@ export default function Table({ data ,entity }: { data: {id:string,name?:string,
         año_de_nacimiento: 'AÑO DE NACIMIENTO',
         género: 'GÉNERO'
     };
-    
+    const handleClick = (id:string) => {
+        setSelectedId(parseInt(id));
+        onOpen();
+    }
     return (
         <div className="w-full overflow-x-auto p-4">
             <TableComponent 
@@ -106,7 +109,7 @@ export default function Table({ data ,entity }: { data: {id:string,name?:string,
                 </TableHeader>
                 <TableBody>
                     {processedData.map((item: { [key: string]: string }, index) => (
-                        <TableRow key={item.id} className={index % 2 === 0 ? "bg-gray-800/20" : "bg-gray-900/20"}>
+                        <TableRow key={item.id} className={index % 2 === 0 ? "bg-gray-800/20" : "bg-gray-900/20"} onClick={() => handleClick(item.id)}>
                             {visibleColumns.map((key) => (
                                 <TableCell key={`${item.id}-${key}`} className="text-center">
                                     {key === 'id' ? (

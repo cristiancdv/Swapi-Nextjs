@@ -1,17 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   images: {
     localPatterns: [
       {
         pathname: '/assets/images/**',
         search: '**',
-      },
-    ],
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'starwars-visualguide.com',
       },
     ],
   }

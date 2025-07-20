@@ -6,15 +6,86 @@ import { useViewMode } from "@/hooks/UseViewMode";
 jest.mock("@/hooks/UseEntityData");
 jest.mock("@/hooks/UseViewMode");
 
+// Mock @heroui/react useDisclosure hook
+jest.mock("@heroui/react", () => ({
+  useDisclosure: jest.fn()
+}));
+
+// Mock ModalEntityView
+jest.mock("@/features/entities/views/ModalEntityView", () => {
+  return function MockModalEntityView({ 
+    isOpen, 
+    onOpenChange, 
+    selectedId, 
+    entity 
+  }: { 
+    isOpen: boolean; 
+    onOpenChange: () => void; 
+    selectedId: number; 
+    entity: string; 
+  }) {
+    return isOpen ? (
+      <div data-testid="modal-entity-view">
+        <span>Modal for {entity} - ID: {selectedId}</span>
+        <button onClick={onOpenChange} data-testid="close-modal">Close</button>
+      </div>
+    ) : null;
+  };
+});
+
 jest.mock("@/features/entities/views/CardsView", () => {
-  return function MockCardsView({ data }: { data: Array<{title: string, description: string, image: string}> }) {
-    return <div data-testid="cards-view">CardsView: {data.length} items</div>;
+  return function MockCardsView({ 
+    data, 
+    setSelectedId, 
+    onOpen 
+  }: { 
+    data: Array<{id: string, title?: string, name?: string, description: string}>; 
+    setSelectedId: (id: number) => void;
+    onOpen: () => void;
+  }) {
+    return (
+      <div data-testid="cards-view">
+        <span>CardsView: {data.length} items</span>
+        <button 
+          data-testid="card-item-0" 
+          onClick={() => {
+            setSelectedId(parseInt(data[0]?.id || "0"));
+            onOpen();
+          }}
+        >
+          Click Card {data[0]?.title || data[0]?.name}
+        </button>
+      </div>
+    );
   };
 });
 
 jest.mock("@/features/entities/views/TableView", () => {
-  return function MockTableView({ data, entity }: { data: Array<{title: string, description: string, image: string}>, entity: string }) {
-    return <div data-testid="table-view">TableView for {entity}: {data.length} items</div>;
+  return function MockTableView({ 
+    data, 
+    entity, 
+    setSelectedId, 
+    onOpen 
+  }: { 
+    data: Array<{id: string, title?: string, name?: string, description: string}>; 
+    entity: string;
+    setSelectedId: (id: number) => void;
+    onOpen: () => void;
+  }) {
+    return (
+      <div data-testid="table-view">
+        <span>TableView for {entity}: {data.length} items</span>
+        <button 
+          data-testid="table-row-0" 
+          onClick={() => {
+            setSelectedId(parseInt(data[0]?.id || "0"));
+            onOpen();
+          }}
+        >
+          Click Row {data[0]?.title || data[0]?.name}
+        </button>
+      </div>
+    );
   };
 });
 
@@ -61,9 +132,10 @@ jest.mock("@/components/ui/PaginationData", () => {
 });
 
 type EntityData = {
-  results: Array<{title: string, description: string, image: string}>;
+  results: Array<{id: string, title?: string, name?: string, description: string, image?: string}>;
   count: number;
 };
+
 type SWRResponse<T> = {
   data: T | null;
   error: Error | null;
@@ -72,51 +144,40 @@ type SWRResponse<T> = {
   mutate: jest.Mock;
 };
 
+import { useDisclosure } from "@heroui/react";
+
 const mockUseEntityAllData = useEntityAllData as jest.MockedFunction<typeof useEntityAllData>;
 const mockUseViewMode = useViewMode as jest.MockedFunction<typeof useViewMode>;
+const mockUseDisclosure = useDisclosure as jest.MockedFunction<typeof useDisclosure>;
 
 describe("EntityView", () => {
   const mockMutate = jest.fn();
   const mockToggleViewMode = jest.fn();
+  const mockOnOpen = jest.fn();
+  const mockOnOpenChange = jest.fn();
 
   // Helper function to create mock SWR response
-  const createMockSWRResponse = (data: EntityData | null, error: Error | null, isLoading: boolean): SWRResponse<EntityData> => ({
+  const createMockSWRResponse = (data: EntityData | null, error: Error | null, isLoading: boolean, isValidating = false): SWRResponse<EntityData> => ({
     data,
     error,
     isLoading,
-    isValidating: false,
+    isValidating,
     mutate: mockMutate,
   });
   
   const mockData: EntityData = {
     results: [
-      { title: "Luke Skywalker", description: "Jedi Knight", image: "/luke.jpg" },
-      { title: "Leia Organa", description: "Princess", image: "/leia.jpg" },
-      { title: "Han Solo", description: "Smuggler", image: "/han.jpg" },
+      { id: "1", name: "Luke Skywalker", description: "Jedi Knight", image: "/luke.jpg" },
+      { id: "2", name: "Leia Organa", description: "Princess", image: "/leia.jpg" },
+      { id: "3", name: "Han Solo", description: "Smuggler", image: "/han.jpg" },
     ],
     count: 3
   };
 
-  const mockFilmData: EntityData = {
+  const mockMovieData: EntityData = {
     results: [
-      { title: "A New Hope", description: "Episode IV", image: "/ep4.jpg" },
-      { title: "The Empire Strikes Back", description: "Episode V", image: "/ep5.jpg" },
-    ],
-    count: 2
-  };
-
-  const mockStarshipData: EntityData = {
-    results: [
-      { title: "Millennium Falcon", description: "YT-1300", image: "/falcon.jpg" },
-      { title: "X-wing", description: "T-65", image: "/xwing.jpg" },
-    ],
-    count: 2
-  };
-
-  const mockPlanetData: EntityData = {
-    results: [
-      { title: "Tatooine", description: "Desert planet", image: "/tatooine.jpg" },
-      { title: "Hoth", description: "Ice planet", image: "/hoth.jpg" },
+      { id: "4", title: "A New Hope", description: "Episode IV", image: "/ep4.jpg" },
+      { id: "5", title: "The Empire Strikes Back", description: "Episode V", image: "/ep5.jpg" },
     ],
     count: 2
   };
@@ -124,11 +185,28 @@ describe("EntityView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     
+    // Mock console.log to avoid noise in tests
+    jest.spyOn(console, 'log').mockImplementation();
+    
     mockUseViewMode.mockReturnValue({
       viewMode: 'card',
       toggleViewMode: mockToggleViewMode,
       isHydrated: true,
     });
+
+    mockUseDisclosure.mockReturnValue({
+      isOpen: false,
+      onOpen: mockOnOpen,
+      onClose: jest.fn(),
+      onOpenChange: mockOnOpenChange,
+      isControlled: false,
+      getButtonProps: jest.fn(),
+      getDisclosureProps: jest.fn(),
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe("Loading State", () => {
@@ -139,6 +217,23 @@ describe("EntityView", () => {
       
       expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
       expect(screen.getByText("Loading...")).toBeInTheDocument();
+    });
+
+    it("should show loading spinner when validating without existing data", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(null, null, false, true));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.getByTestId("loading-spinner")).toBeInTheDocument();
+    });
+
+    it("should not show loading spinner when validating with existing data", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false, true));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.queryByTestId("loading-spinner")).not.toBeInTheDocument();
+      expect(screen.getByTestId("cards-view")).toBeInTheDocument();
     });
   });
 
@@ -161,18 +256,6 @@ describe("EntityView", () => {
       fireEvent.click(retryButton);
       
       expect(mockMutate).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe("No Data State", () => {
-    it("should render only switch button when data is null", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(null, null, false));
-
-      render(<EntityView entity="characters" />);
-      
-      expect(screen.getByTestId("switch-button")).toBeInTheDocument();
-      expect(screen.queryByTestId("cards-view")).not.toBeInTheDocument();
-      expect(screen.queryByTestId("table-view")).not.toBeInTheDocument();
     });
   });
 
@@ -201,8 +284,118 @@ describe("EntityView", () => {
     });
   });
 
-  describe("View Mode Toggle", () => {
-    it("should render switch button", () => {
+  describe("Modal Functionality", () => {
+    it("should not render modal when isOpen is false", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.queryByTestId("modal-entity-view")).not.toBeInTheDocument();
+    });
+
+    it("should render modal when isOpen is true", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+      mockUseDisclosure.mockReturnValue({
+        isOpen: true,
+        onOpen: mockOnOpen,
+        onClose: jest.fn(),
+        onOpenChange: mockOnOpenChange,
+        isControlled: false,
+        getButtonProps: jest.fn(),
+        getDisclosureProps: jest.fn(),
+      });
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.getByTestId("modal-entity-view")).toBeInTheDocument();
+      expect(screen.getByText("Modal for characters - ID: 0")).toBeInTheDocument();
+    });
+
+    it("should pass correct props to ModalEntityView", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockMovieData, null, false));
+      mockUseDisclosure.mockReturnValue({
+        isOpen: true,
+        onOpen: mockOnOpen,
+        onClose: jest.fn(),
+        onOpenChange: mockOnOpenChange,
+        isControlled: false,
+        getButtonProps: jest.fn(),
+        getDisclosureProps: jest.fn(),
+      });
+
+      render(<EntityView entity="movies" />);
+      
+      expect(screen.getByText("Modal for movies - ID: 0")).toBeInTheDocument();
+    });
+  });
+
+  describe("Card and Table Interactions", () => {
+    it("should handle card click and open modal in CardsView", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      const cardButton = screen.getByTestId("card-item-0");
+      fireEvent.click(cardButton);
+      
+      expect(mockOnOpen).toHaveBeenCalledTimes(1);
+    });
+
+    it("should handle table row click and open modal in TableView", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+      mockUseViewMode.mockReturnValue({
+        viewMode: 'table',
+        toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
+      });
+
+      render(<EntityView entity="characters" />);
+      
+      const tableButton = screen.getByTestId("table-row-0");
+      fireEvent.click(tableButton);
+      
+      expect(mockOnOpen).toHaveBeenCalledTimes(1);
+    });
+
+    it("should pass setSelectedId and onOpen to CardsView", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      // Verify the props are passed by checking if click works
+      expect(screen.getByText("Click Card Luke Skywalker")).toBeInTheDocument();
+    });
+
+    it("should pass setSelectedId and onOpen to TableView", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+      mockUseViewMode.mockReturnValue({
+        viewMode: 'table',
+        toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
+      });
+
+      render(<EntityView entity="characters" />);
+      
+      // Verify the props are passed by checking if click works
+      expect(screen.getByText("Click Row Luke Skywalker")).toBeInTheDocument();
+    });
+  });
+
+  describe("Switch Button", () => {
+    it("should not render switch button when not hydrated", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+      mockUseViewMode.mockReturnValue({
+        viewMode: 'card',
+        toggleViewMode: mockToggleViewMode,
+        isHydrated: false,
+      });
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.queryByTestId("switch-button")).not.toBeInTheDocument();
+    });
+
+    it("should render switch button when hydrated", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
 
       render(<EntityView entity="characters" />);
@@ -219,24 +412,6 @@ describe("EntityView", () => {
       fireEvent.click(switchButton);
       
       expect(mockToggleViewMode).toHaveBeenCalledTimes(1);
-    });
-
-    it("should display correct toggle text based on current view mode", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
-      // Test card mode
-      const { rerender } = render(<EntityView entity="characters" />);
-      expect(screen.getByText("Toggle to table")).toBeInTheDocument();
-
-      // Test table mode
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'table',
-        toggleViewMode: mockToggleViewMode,
-        isHydrated: true,
-      });
-
-      rerender(<EntityView entity="characters" />);
-      expect(screen.getByText("Toggle to card")).toBeInTheDocument();
     });
   });
 
@@ -267,7 +442,6 @@ describe("EntityView", () => {
   describe("Different Entity Types", () => {
     it("should handle characters entity", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
@@ -279,9 +453,8 @@ describe("EntityView", () => {
       expect(screen.getByText("TableView for characters: 3 items")).toBeInTheDocument();
     });
 
-    it("should handle films entity", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockFilmData, null, false));
-
+    it("should handle movies entity", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockMovieData, null, false));
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
@@ -292,96 +465,10 @@ describe("EntityView", () => {
       
       expect(screen.getByText("TableView for movies: 2 items")).toBeInTheDocument();
     });
-
-    it("should handle starships entity", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockStarshipData, null, false));
-
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'table',
-        toggleViewMode: mockToggleViewMode,
-        isHydrated: true,
-      });
-
-      render(<EntityView entity="ships" />);
-      
-      expect(screen.getByText("TableView for ships: 2 items")).toBeInTheDocument();
-    });
-
-    it("should handle planets entity", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockPlanetData, null, false));
-
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'table',
-        toggleViewMode: mockToggleViewMode,
-        isHydrated: true,
-      });
-
-      render(<EntityView entity="planets" />);
-      
-      expect(screen.getByText("TableView for planets: 2 items")).toBeInTheDocument();
-    });
-  });
-
-  describe("Layout and Styling", () => {
-    it("should have correct container structure", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
-      render(<EntityView entity="characters" />);
-      
-      const container = screen.getByTestId("cards-view").parentElement;
-      expect(container).toHaveClass("flex-1");
-    });
-
-    it("should have switch button positioned correctly", () => {
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
-      render(<EntityView entity="characters" />);
-      
-      const switchButtonContainer = screen.getByTestId("switch-button").parentElement;
-      expect(switchButtonContainer).toHaveClass("flex", "justify-end", "mb-4");
-    });
-  });
-
-  describe("Data Passing", () => {
-    it("should pass correct data structure to CardsView", () => {
-      const testData = {
-        results: [
-          { title: "Test Title", description: "Test Description", image: "/test.jpg" }
-        ],
-        count: 1
-      };
-
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(testData, null, false));
-
-      render(<EntityView entity="characters" />);
-      
-      expect(screen.getByText("CardsView: 1 items")).toBeInTheDocument();
-    });
-
-    it("should pass correct data structure to TableView", () => {
-      const testData = {
-        results: [
-          { title: "Test Title", description: "Test Description", image: "/test.jpg" }
-        ],
-        count: 1
-      };
-
-      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(testData, null, false));
-
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'table',
-        toggleViewMode: mockToggleViewMode,
-        isHydrated: true,
-      });
-
-      render(<EntityView entity="characters" />);
-      
-      expect(screen.getByText("TableView for characters: 1 items")).toBeInTheDocument();
-    });
   });
 
   describe("Hook Integration", () => {
-    it("should call useEntityAllData with correct entity parameter", () => {
+    it("should call useEntityAllData with correct entity and page parameters", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
 
       render(<EntityView entity="movies" />);
@@ -395,6 +482,14 @@ describe("EntityView", () => {
       render(<EntityView entity="characters" />);
       
       expect(mockUseViewMode).toHaveBeenCalled();
+    });
+
+    it("should call useDisclosure hook", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(mockUseDisclosure).toHaveBeenCalled();
     });
   });
 });

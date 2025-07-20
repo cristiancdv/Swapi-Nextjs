@@ -11,3 +11,9 @@ export function useEntityAllData<T>(endpoint: string,page:number) : SWRResponse<
     }
     return useSWR<T>(url,fetchEntity);
 };
+
+export function useEntityOneData<T>(endpoint:string,id:number) : SWRResponse<T> {
+    const {apiUrl} = config;
+    const url = apiUrl.endsWith('/') ? apiUrl + endpoint + '/' + id : apiUrl + '/' + endpoint + '/' + id;
+    return useSWR<T>(url,fetchEntity);
+}
