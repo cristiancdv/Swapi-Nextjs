@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <div className={`relativ h-[80vh] ${styles.perspective} overflow-hidden text-yellow-400`}>
     <div className={`relative z-10  ${styles['preserve-3d']} flex items-end justify-center pb-12`}>
-    <div className={`w-full ${styles['animate-crawl']} text-justify space-y-6 text-lg leading-8`}>
+    <div className={`w-full ${styles['animate-crawl']}  text-center space-y-6 text-lg leading-8`}>
         <h1 className="text-center text-3xl font-bold mb-4">Hola, soy Cristian Damian Vazquez</h1>
         <p>En tiempos de bugs y deadlines, los desarrolladores buscan balancear el caos con buenas prácticas.</p>
         <p>Como líder técnico, mi misión es defender la arquitectura limpia, mentorizar a los jóvenes padawan y
