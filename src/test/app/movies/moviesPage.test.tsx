@@ -4,7 +4,15 @@ import MoviesPage from "@/app/movies/page";
 // mocks arriba o en setup
 jest.mock('@/hooks/UseEntityData', () => ({
   useEntityAllData: jest.fn(() => ({
-    data: [{ title: 'The Empire Strikes Back', description: 'The Empire Back', image: '/empire.jpg' }],
+    data: {
+      results: [{ 
+        id: '1', 
+        title: 'The Empire Strikes Back', 
+        description: 'The Empire Back', 
+        image: '/empire.jpg' 
+      }],
+      count: 1
+    },
     error: null,
     isLoading: false,
     mutate: jest.fn(),

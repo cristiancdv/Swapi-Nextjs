@@ -49,7 +49,21 @@ jest.mock("@/components/ui/ErrorMessage", () => {
   };
 });
 
-type EntityData = Array<{title: string, description: string, image: string}>;
+jest.mock("@/components/ui/PaginationData", () => {
+  return function MockPaginationData({ page, setPage, count }: { page: number, setPage: (page: number) => void, count: number }) {
+    return (
+      <div data-testid="pagination">
+        <span>Page {page} of {Math.ceil(count / 10)}</span>
+        <button onClick={() => setPage(page + 1)}>Next</button>
+      </div>
+    );
+  };
+});
+
+type EntityData = {
+  results: Array<{title: string, description: string, image: string}>;
+  count: number;
+};
 type SWRResponse<T> = {
   data: T | null;
   error: Error | null;
@@ -74,26 +88,38 @@ describe("EntityView", () => {
     mutate: mockMutate,
   });
   
-  const mockData: EntityData = [
-    { title: "Luke Skywalker", description: "Jedi Knight", image: "/luke.jpg" },
-    { title: "Leia Organa", description: "Princess", image: "/leia.jpg" },
-    { title: "Han Solo", description: "Smuggler", image: "/han.jpg" },
-  ];
+  const mockData: EntityData = {
+    results: [
+      { title: "Luke Skywalker", description: "Jedi Knight", image: "/luke.jpg" },
+      { title: "Leia Organa", description: "Princess", image: "/leia.jpg" },
+      { title: "Han Solo", description: "Smuggler", image: "/han.jpg" },
+    ],
+    count: 3
+  };
 
-  const mockFilmData: EntityData = [
-    { title: "A New Hope", description: "Episode IV", image: "/ep4.jpg" },
-    { title: "The Empire Strikes Back", description: "Episode V", image: "/ep5.jpg" },
-  ];
+  const mockFilmData: EntityData = {
+    results: [
+      { title: "A New Hope", description: "Episode IV", image: "/ep4.jpg" },
+      { title: "The Empire Strikes Back", description: "Episode V", image: "/ep5.jpg" },
+    ],
+    count: 2
+  };
 
-  const mockStarshipData: EntityData = [
-    { title: "Millennium Falcon", description: "YT-1300", image: "/falcon.jpg" },
-    { title: "X-wing", description: "T-65", image: "/xwing.jpg" },
-  ];
+  const mockStarshipData: EntityData = {
+    results: [
+      { title: "Millennium Falcon", description: "YT-1300", image: "/falcon.jpg" },
+      { title: "X-wing", description: "T-65", image: "/xwing.jpg" },
+    ],
+    count: 2
+  };
 
-  const mockPlanetData: EntityData = [
-    { title: "Tatooine", description: "Desert planet", image: "/tatooine.jpg" },
-    { title: "Hoth", description: "Ice planet", image: "/hoth.jpg" },
-  ];
+  const mockPlanetData: EntityData = {
+    results: [
+      { title: "Tatooine", description: "Desert planet", image: "/tatooine.jpg" },
+      { title: "Hoth", description: "Ice planet", image: "/hoth.jpg" },
+    ],
+    count: 2
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -101,6 +127,7 @@ describe("EntityView", () => {
     mockUseViewMode.mockReturnValue({
       viewMode: 'card',
       toggleViewMode: mockToggleViewMode,
+      isHydrated: true,
     });
   });
 
@@ -138,23 +165,20 @@ describe("EntityView", () => {
   });
 
   describe("No Data State", () => {
-    it("should render nothing when data is null", () => {
+    it("should render only switch button when data is null", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(null, null, false));
 
-      const { container } = render(<EntityView entity="characters" />);
+      render(<EntityView entity="characters" />);
       
-      expect(container.firstChild).toBeNull();
+      expect(screen.getByTestId("switch-button")).toBeInTheDocument();
+      expect(screen.queryByTestId("cards-view")).not.toBeInTheDocument();
+      expect(screen.queryByTestId("table-view")).not.toBeInTheDocument();
     });
   });
 
   describe("Data Display", () => {
     it("should render CardsView when viewMode is 'card'", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'card',
-        toggleViewMode: mockToggleViewMode,
-      });
 
       render(<EntityView entity="characters" />);
       
@@ -164,10 +188,10 @@ describe("EntityView", () => {
 
     it("should render TableView when viewMode is 'table'", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
-
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
       render(<EntityView entity="characters" />);
@@ -201,11 +225,6 @@ describe("EntityView", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
 
       // Test card mode
-      mockUseViewMode.mockReturnValue({
-        viewMode: 'card',
-        toggleViewMode: mockToggleViewMode,
-      });
-
       const { rerender } = render(<EntityView entity="characters" />);
       expect(screen.getByText("Toggle to table")).toBeInTheDocument();
 
@@ -213,10 +232,35 @@ describe("EntityView", () => {
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
       rerender(<EntityView entity="characters" />);
       expect(screen.getByText("Toggle to card")).toBeInTheDocument();
+    });
+  });
+
+  describe("Pagination", () => {
+    it("should render pagination when count > 10", () => {
+      const largeDataSet = {
+        results: mockData.results,
+        count: 15
+      };
+      
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(largeDataSet, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.getByTestId("pagination")).toBeInTheDocument();
+      expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+    });
+
+    it("should not render pagination when count <= 10", () => {
+      mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
+
+      render(<EntityView entity="characters" />);
+      
+      expect(screen.queryByTestId("pagination")).not.toBeInTheDocument();
     });
   });
 
@@ -227,6 +271,7 @@ describe("EntityView", () => {
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
       render(<EntityView entity="characters" />);
@@ -240,11 +285,12 @@ describe("EntityView", () => {
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
-      render(<EntityView entity="films" />);
+      render(<EntityView entity="movies" />);
       
-      expect(screen.getByText("TableView for films: 2 items")).toBeInTheDocument();
+      expect(screen.getByText("TableView for movies: 2 items")).toBeInTheDocument();
     });
 
     it("should handle starships entity", () => {
@@ -253,11 +299,12 @@ describe("EntityView", () => {
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
-      render(<EntityView entity="starships" />);
+      render(<EntityView entity="ships" />);
       
-      expect(screen.getByText("TableView for starships: 2 items")).toBeInTheDocument();
+      expect(screen.getByText("TableView for ships: 2 items")).toBeInTheDocument();
     });
 
     it("should handle planets entity", () => {
@@ -266,6 +313,7 @@ describe("EntityView", () => {
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
       render(<EntityView entity="planets" />);
@@ -281,7 +329,7 @@ describe("EntityView", () => {
       render(<EntityView entity="characters" />);
       
       const container = screen.getByTestId("cards-view").parentElement;
-      expect(container).toHaveClass("p-6");
+      expect(container).toHaveClass("flex-1");
     });
 
     it("should have switch button positioned correctly", () => {
@@ -296,9 +344,12 @@ describe("EntityView", () => {
 
   describe("Data Passing", () => {
     it("should pass correct data structure to CardsView", () => {
-      const testData = [
-        { title: "Test Title", description: "Test Description", image: "/test.jpg" }
-      ];
+      const testData = {
+        results: [
+          { title: "Test Title", description: "Test Description", image: "/test.jpg" }
+        ],
+        count: 1
+      };
 
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(testData, null, false));
 
@@ -308,15 +359,19 @@ describe("EntityView", () => {
     });
 
     it("should pass correct data structure to TableView", () => {
-      const testData = [
-        { title: "Test Title", description: "Test Description", image: "/test.jpg" }
-      ];
+      const testData = {
+        results: [
+          { title: "Test Title", description: "Test Description", image: "/test.jpg" }
+        ],
+        count: 1
+      };
 
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(testData, null, false));
 
       mockUseViewMode.mockReturnValue({
         viewMode: 'table',
         toggleViewMode: mockToggleViewMode,
+        isHydrated: true,
       });
 
       render(<EntityView entity="characters" />);
@@ -329,9 +384,9 @@ describe("EntityView", () => {
     it("should call useEntityAllData with correct entity parameter", () => {
       mockUseEntityAllData.mockReturnValue(createMockSWRResponse(mockData, null, false));
 
-      render(<EntityView entity="films" />);
+      render(<EntityView entity="movies" />);
       
-      expect(mockUseEntityAllData).toHaveBeenCalledWith("films");
+      expect(mockUseEntityAllData).toHaveBeenCalledWith("movies", 1);
     });
 
     it("should call useViewMode hook", () => {

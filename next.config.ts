@@ -7,7 +7,13 @@ const nextConfig: NextConfig = {
         pathname: '/assets/images/**',
         search: '**',
       },
-    ]
+    ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'starwars-visualguide.com',
+      },
+    ],
   }
 };
 

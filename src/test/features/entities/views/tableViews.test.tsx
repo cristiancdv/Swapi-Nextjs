@@ -5,34 +5,48 @@ describe("TableView", () => {
     it("should render the table view", () => {
         const data = [
             {
-                title: "Luke Skywalker",
-                description: "Luke Skywalker is a character in the Star Wars franchise.",
+                id: "1",
+                name: "Luke Skywalker",
+                description: "Altura: 172\nPeso: 77\nColor de pelo: blond\nColor de ojos: blue",
                 image: "https://via.placeholder.com/150",
             },
             {
-                title: "Darth Vader",
-                description: "Darth Vader is a character in the Star Wars franchise.",
+                id: "2",
+                name: "Darth Vader",
+                description: "Altura: 202\nPeso: 136\nColor de pelo: none\nColor de ojos: yellow",
                 image: "https://via.placeholder.com/151",
             },
             {
-                title: "Leia Organa",
-                description: "Leia Organa is a character in the Star Wars franchise.",
+                id: "3",
+                name: "Leia Organa",
+                description: "Altura: 150\nPeso: 49\nColor de pelo: brown\nColor de ojos: brown",
                 image: "https://via.placeholder.com/152",
             },
             {
-                title: "Han Solo",
-                description: "Han Solo is a character in the Star Wars franchise.",
+                id: "4",
+                name: "Han Solo",
+                description: "Altura: 180\nPeso: 80\nColor de pelo: brown\nColor de ojos: brown",
                 image: "https://via.placeholder.com/153",
             },
         ]
         render(<TableView data={data} entity="characters" />);
+        
+        // Test that names are displayed
         expect(screen.getByText("Luke Skywalker")).toBeInTheDocument();
         expect(screen.getByText("Darth Vader")).toBeInTheDocument();
         expect(screen.getByText("Leia Organa")).toBeInTheDocument();
         expect(screen.getByText("Han Solo")).toBeInTheDocument();
-        expect(screen.getByText("Luke Skywalker is a character in the Star Wars franchise.")).toBeInTheDocument();
-        expect(screen.getByText("Darth Vader is a character in the Star Wars franchise.")).toBeInTheDocument();
-        expect(screen.getByText("Leia Organa is a character in the Star Wars franchise.")).toBeInTheDocument();
-        expect(screen.getByText("Han Solo is a character in the Star Wars franchise.")).toBeInTheDocument();
+        
+        // Test that parsed data is displayed
+        expect(screen.getByText("172")).toBeInTheDocument();
+        expect(screen.getByText("202")).toBeInTheDocument();
+        expect(screen.getByText("150")).toBeInTheDocument();
+        expect(screen.getByText("180")).toBeInTheDocument();
+        
+        // Test column headers
+        expect(screen.getByText("ID")).toBeInTheDocument();
+        expect(screen.getByText("NOMBRE")).toBeInTheDocument();
+        expect(screen.getByText("ALTURA")).toBeInTheDocument();
+        expect(screen.getByText("PESO")).toBeInTheDocument();
         });
 });

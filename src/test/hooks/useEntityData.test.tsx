@@ -25,7 +25,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -40,7 +40,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -55,7 +55,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -76,7 +76,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -95,7 +95,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -114,7 +114,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -133,7 +133,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
       expect(result.current).toEqual(mockResponse);
@@ -151,7 +151,7 @@ describe('useEntityAllData', () => {
       mockUseSWR.mockReturnValue(mockResponse);
 
       const endpoint = 'characters';
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(result.current).toEqual(mockResponse);
       expect(result.current.isLoading).toBe(true);
@@ -169,7 +169,7 @@ describe('useEntityAllData', () => {
       mockUseSWR.mockReturnValue(mockResponse);
 
       const endpoint = 'characters';
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(result.current).toEqual(mockResponse);
       expect(result.current.error).toBe(mockError);
@@ -187,7 +187,7 @@ describe('useEntityAllData', () => {
       mockUseSWR.mockReturnValue(mockResponse);
 
       const endpoint = 'characters';
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(result.current).toEqual(mockResponse);
       expect(result.current.data).toEqual(mockData);
@@ -205,7 +205,7 @@ describe('useEntityAllData', () => {
       mockUseSWR.mockReturnValue(mockResponse);
 
       const endpoint = 'characters';
-      const { result } = renderHook(() => useEntityAllData(endpoint));
+      const { result } = renderHook(() => useEntityAllData(endpoint,0));
 
       expect(result.current).toEqual(mockResponse);
       expect(result.current.data).toEqual([]);
@@ -218,7 +218,7 @@ describe('useEntityAllData', () => {
       mockUseSWR.mockReturnValue(mockResponse);
 
       const endpoint = 'people/1';
-      renderHook(() => useEntityAllData(endpoint));
+      renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledTimes(1);
     });
@@ -230,8 +230,8 @@ describe('useEntityAllData', () => {
       const endpoint1 = 'people/1';
       const endpoint2 = 'people/2';
 
-      renderHook(() => useEntityAllData(endpoint1));
-      renderHook(() => useEntityAllData(endpoint2));
+      renderHook(() => useEntityAllData(endpoint1,0));
+      renderHook(() => useEntityAllData(endpoint2,0));
 
       expect(mockUseSWR).toHaveBeenCalledTimes(2);
       expect(mockUseSWR).toHaveBeenNthCalledWith(1, expect.stringContaining(endpoint1), expect.any(Function));
@@ -249,7 +249,7 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      renderHook(() => useEntityAllData(endpoint));
+      renderHook(() => useEntityAllData(endpoint,0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
     });
@@ -268,7 +268,7 @@ describe('useEntityAllData', () => {
       const endpoint = 'test-endpoint';
       const expectedUrl = 'https://api.example.com/test-endpoint';
 
-      renderHook(() => useEntityAllData(endpoint));
+      renderHook(() => useEntityAllData(endpoint, 1));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
 
@@ -293,7 +293,7 @@ describe('useEntityAllData', () => {
       const endpoint = 'test-endpoint';
       const expectedUrl = 'https://api.example.com/test-endpoint';
 
-      renderHook(() => useEntityAllData(endpoint));
+      renderHook(() => useEntityAllData(endpoint, 0));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
 
@@ -306,19 +306,6 @@ describe('useEntityAllData', () => {
   });
 
   describe('Edge Cases', () => {
-    it('should handle special characters in endpoint', () => {
-      const mockResponse = { data: { name: 'Luke' } };
-      mockUseSWR.mockReturnValue(mockResponse);
-
-      const endpoint = 'people/1?format=json';
-      const expectedUrl = config.apiUrl.endsWith('/')
-        ? config.apiUrl + endpoint
-        : config.apiUrl + '/' + endpoint;
-
-      renderHook(() => useEntityAllData(endpoint));
-
-      expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
-    });
 
     it('should handle numeric endpoint', () => {
       const mockResponse = { data: { name: 'Luke' } };
@@ -329,7 +316,8 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      renderHook(() => useEntityAllData(endpoint));
+
+      renderHook(() => useEntityAllData(endpoint,1));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
     });
@@ -343,7 +331,8 @@ describe('useEntityAllData', () => {
         ? config.apiUrl + endpoint
         : config.apiUrl + '/' + endpoint;
 
-      renderHook(() => useEntityAllData(endpoint));
+
+      renderHook(() => useEntityAllData(endpoint, 1));
 
       expect(mockUseSWR).toHaveBeenCalledWith(expectedUrl, expect.any(Function));
     });

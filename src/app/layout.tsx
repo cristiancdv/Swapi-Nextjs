@@ -31,10 +31,10 @@ export default function RootLayout({
     <html lang="en">
 
       <body
-        className={`${geistSans.variable} ${geistMono.variable}  flex flex-col h-screen antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex flex-col min-h-screen antialiased`}
       >
         <NavBar />
-        <main className="flex-1 h-[80%]">
+        <main className="flex-1 overflow-auto">
           {children}
         </main>
         <Footer />

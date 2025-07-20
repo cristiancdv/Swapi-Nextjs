@@ -1,6 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react'
 import ErrorMessage from '@/components/ui/ErrorMessage'
 
+jest.mock('@heroui/react', () => ({
+  Button: ({ children, onPress, className }: { children: React.ReactNode, onPress: () => void, className: string }) => (
+    <button onClick={onPress} className={className}>
+      {children}
+    </button>
+  )
+}));
+
 describe("ErrorMessage", () => {
     it("should render the error message", () => {
         const onRetry = jest.fn();

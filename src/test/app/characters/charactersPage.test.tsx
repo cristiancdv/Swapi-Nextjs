@@ -4,7 +4,15 @@ import CharactersPage from "@/app/characters/page";
 // mocks arriba o en setup
 jest.mock('@/hooks/UseEntityData', () => ({
   useEntityAllData: jest.fn(() => ({
-    data: [{ title: 'Luke Skywalker', description: 'Jedi', image: '/luke.jpg' }],
+    data: {
+      results: [{ 
+        id: '1', 
+        name: 'Luke Skywalker', 
+        description: 'Jedi', 
+        image: '/luke.jpg' 
+      }],
+      count: 1
+    },
     error: null,
     isLoading: false,
     mutate: jest.fn(),

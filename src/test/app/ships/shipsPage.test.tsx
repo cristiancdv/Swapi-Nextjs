@@ -4,7 +4,15 @@ import ShipsPage from "@/app/ships/page";
 // mocks arriba o en setup
 jest.mock('@/hooks/UseEntityData', () => ({
   useEntityAllData: jest.fn(() => ({
-    data: [{ title: 'Millennium Falcon', description: 'Millennium Falcon is a ship', image: '/millennium-falcon.jpg' }],
+    data: {
+      results: [{ 
+        id: '1', 
+        name: 'Millennium Falcon', 
+        description: 'Millennium Falcon is a ship', 
+        image: '/millennium-falcon.jpg' 
+      }],
+      count: 1
+    },
     error: null,
     isLoading: false,
     mutate: jest.fn(),

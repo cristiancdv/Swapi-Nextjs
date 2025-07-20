@@ -4,10 +4,17 @@ import LoadingLogo from '@/assets/images/LoadingLogo.svg';
 
 export default function LoadingSpinner() {
     return (
-      <div className="flex items-center justify-center w-full h-full p-10">
-        <div className="animate-spin-slow">
-          <Image src={LoadingLogo} alt="Cargando…" width={96} height={96} className="opacity-90 animate-spin-slow" />
+      <div className="flex flex-col items-center h-[80vh] justify-center w-full  max-h-screen">
+        <div className="animate-spin">
+          <Image 
+            src={LoadingLogo} 
+            alt="Cargando…" 
+            width={128} 
+            height={128} 
+            className="opacity-90 " 
+          />
         </div>
+         <p className="text-white text-sm">Cargando…</p>
       </div>
     );
   }

@@ -3,13 +3,13 @@ import ListIcon from "@/assets/icons/ListIcon";
 import {useSwitch,VisuallyHidden} from "@heroui/react";
 
 export default function SwitchButton({ viewMode, toggleViewMode }: { viewMode: string, toggleViewMode: () => void }) {
-    const {Component, slots, isSelected, getBaseProps, getInputProps, getWrapperProps} =
+    const {Component, slots, getBaseProps, getInputProps, getWrapperProps} =
     useSwitch({
-        value: viewMode === 'card' ? 'card' : 'list',
+        isSelected: viewMode === 'card',
         onValueChange: toggleViewMode,
     });
     return (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col bg-gradient-to-b from-gray-600 to-gray-800 rounded-lg p-2 gap-2">
           <Component {...getBaseProps()}>
             <VisuallyHidden>
               <input {...getInputProps()} />
@@ -24,10 +24,9 @@ export default function SwitchButton({ viewMode, toggleViewMode }: { viewMode: s
                 ],
               })}
             >
-              {isSelected ? <ListIcon /> : <CardIcon />}
+              {viewMode === 'table' ? <ListIcon /> : <CardIcon />}
             </div>
           </Component>
-          <p className="text-default-500 select-none">Lights: {isSelected ? "on" : "off"}</p>
         </div>
       );
     };

@@ -4,7 +4,15 @@ import PlanetPage from "@/app/planets/page";
 // mocks arriba o en setup
 jest.mock('@/hooks/UseEntityData', () => ({
   useEntityAllData: jest.fn(() => ({
-    data: [{ title: 'Tatooine', description: 'Tatooine is a desert planet', image: '/tatooine.jpg' }],
+    data: {
+      results: [{ 
+        id: '1', 
+        name: 'Tatooine', 
+        description: 'Tatooine is a desert planet', 
+        image: '/tatooine.jpg' 
+      }],
+      count: 1
+    },
     error: null,
     isLoading: false,
     mutate: jest.fn(),
