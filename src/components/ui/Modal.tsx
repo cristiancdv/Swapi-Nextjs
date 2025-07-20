@@ -14,7 +14,7 @@ import {
      return (
         <Modal classNames={{
           closeButton: "hidden",
-          wrapper: "fixed inset-0 flex items-center left-[36%] w-[30%] justify-center",
+          wrapper: "fixed inset-0 flex items-center md:left-[36%] left-[10%] w-[80%] md:w[30%] justify-center",
           header: "flex flex-col gap-2",
           body: "flex flex-col gap-2",
           base: "relative"
